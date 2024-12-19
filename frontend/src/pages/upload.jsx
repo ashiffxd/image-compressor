@@ -2,13 +2,32 @@ import React from "react";
 import axios from "axios";
 
 function Upload() {
+  const[image , setImage] = React.useState(null);
+
+  async function inputHandler(event) {
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+
+      const formData = new FormData();
+      formData.append("image", file);
+       const res = await axios.post("http://localhost:8000/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        setImage(res.data.compressedImageUrl);
+        console.log(res.data.compressedImageUrl);
+    
+  }
+  
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="h-screen">
+      <div className="flex h-[500px] flex-col items-center justify-center min-h-screen bg-gray-100">
       <form
         action="/upload"
         method="POST"
         encType="multipart/form-data"
-        className="flex flex-col items-center gap-4 p-6 bg-white shadow-lg rounded-md"
+        className="flex flex-col items-center gap-4 p-6 bg-white shadow-lg rounded-md h-[500px] w-[500px]"
       >
         <input
           type="file"
@@ -23,33 +42,18 @@ function Upload() {
         >
           Upload
         </button>
+        <div className="flex items-center justify-center mt-44 h-10">
+    {image &&
+      <img src={image} alt="compressed" className="rounded-md h-[400px] w-250"/>
+    }
+    </div>
       </form>
+    </div>
+
+    
     </div>
   );
 }
 
-async function inputHandler(event) {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-
-  if (file) {
-    const formData = new FormData();
-    formData.append("image", file);
-    await axios
-      .post("http://localhost:8000/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  } else {
-    console.log("File not uploaded");
-  }
-}
 
 export default Upload;
